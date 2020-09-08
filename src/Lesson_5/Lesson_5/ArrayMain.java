@@ -27,20 +27,33 @@ public class ArrayMain {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int q = 0; q < arr1.length / 2; q++) {
-                        arr1[q] = (float) (arr1[q] * Math.sin(0.2f + q / 5) * Math.cos(0.2f + q / 5) * Math.cos(0.4f + q / 2));
+                    synchronized (arr1) {
+                        for (int q = 0; q < arr1.length / 2; q++) {
+                            arr1[q] = (float) (arr1[q] * Math.sin(0.2f + q / 5) * Math.cos(0.2f + q / 5) * Math.cos(0.4f + q / 2));
+                        }
                     }
                 }
             }).start();
 
-                for (int e = 0; e < arr2.length; e++) {
-                    arr2[e] = (float) (arr2[e] * Math.sin(0.2f + e / 5) * Math.cos(0.2f + e / 5) * Math.cos(0.4f + e / 2));
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (arr2) {
+                        for (int e = 0; e < arr2.length; e++) {
+                            arr2[e] = (float) (arr2[e] * Math.sin(0.2f + e / 5) * Math.cos(0.2f + e / 5) * Math.cos(0.4f + e / 2));
+                        }
+                    }
                 }
-                System.arraycopy(arr2, 0, arr1, arr2.length-1, h);
+            }).start();
+            synchronized (arr1) {
+                synchronized (arr2) {
+                    System.arraycopy(arr2, 0, arr1, arr2.length - 1, h);
+                    System.currentTimeMillis();
+                    System.out.println("\nTime calculation for splitting one array into 2 and calculating filling in two threads=  "
+                            + (System.currentTimeMillis() - a));
+                }
 
-                System.currentTimeMillis();
-                System.out.println("\nTime calculation for splitting one array into 2 and calculating filling in two threads=  "
-                                   + (System.currentTimeMillis() - a));
+            }
         }
 
     public static void main(String[] args) {
